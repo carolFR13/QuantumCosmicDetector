@@ -21,6 +21,7 @@
 
 #include "G4OpticalSurface.hh" 
 #include "G4LogicalBorderSurface.hh"
+#include "G4LogicalSkinSurface.hh"
 
 #include "G4GeometryManager.hh"
 #include "G4PhysicalVolumeStore.hh"
@@ -91,6 +92,7 @@ class QDDetectorConstruction : public G4VUserDetectorConstruction{
         G4VisAttributes* fqpuVisAtt = nullptr;
 
         G4OpticalSurface* fScintCoatingSurface = nullptr;
+        G4OpticalSurface* fSiPMSurface = nullptr;
 
         QDSensitiveBarDetector* fSensitiveBarDetector = nullptr;
         QDSensitiveSiPMDetector* fSensitiveSiPMDetector = nullptr;

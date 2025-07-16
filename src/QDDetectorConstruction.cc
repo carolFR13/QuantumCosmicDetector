@@ -98,14 +98,19 @@ void QDDetectorConstruction::UpdateGeometry() {
 
 
 void QDDetectorConstruction::DefineScintillatorMaterials() {
+
+
     G4NistManager *nist = G4NistManager::Instance();
 
     // Get base materials
     fworldMat = nist->FindOrBuildMaterial("G4_AIR");
     fscintillatorMat = nist->FindOrBuildMaterial("G4_POLYSTYRENE");
     fcoatingMat = nist->FindOrBuildMaterial("G4_POLYETHYLENE");
-    fsipmMat = nist->FindOrBuildMaterial("G4_Si");
     fqpuMat = nist->FindOrBuildMaterial("G4_Si");
+    fsipmMat = nist->FindOrBuildMaterial("G4_Si");
+
+    //---------------------------------------------------------------
+    // scintillator optical properties
 
     const G4int nEntries = 2;
     G4double energy[nEntries] = {2.0*eV, 3.5*eV};
@@ -126,18 +131,64 @@ void QDDetectorConstruction::DefineScintillatorMaterials() {
     G4cout << "=== Basic scintillator properties set ===" << G4endl;
     scintMPT->DumpTable();
 
-    fScintCoatingSurface = new G4OpticalSurface("ScintCoatingSurface");
-    fScintCoatingSurface->SetType(dielectric_dielectric);
-    fScintCoatingSurface->SetFinish(groundfrontpainted); // superficie rugosa pintada
-    fScintCoatingSurface->SetModel(unified);             // modelo UNIFIED de Geant4
+    //---------------------------------------------------------------
+    // coating optical properties
 
     G4MaterialPropertiesTable* coatingMPT = new G4MaterialPropertiesTable();
 
-    std::vector<G4double> photonEnergy = {1.5 * eV, 3.5 * eV};
-    std::vector<G4double> reflectivity = {1.0, 1.0};  // 100% reflectante
-    coatingMPT->AddProperty("REFLECTIVITY", photonEnergy, reflectivity);
+    std::vector<G4double> photonEnergy = {1.5 * eV, 3.5 * eV}; // 350–800 nm
+    std::vector<G4double> scintReflectivity = {1.0, 1.0};  // 100% reflectante
+    coatingMPT->AddProperty("REFLECTIVITY", photonEnergy, scintReflectivity);
 
+    //---------------------------------------------------------------
+    // scint - coating interface properties
+
+    fScintCoatingSurface = new G4OpticalSurface("ScintCoatingSurface");
+    fScintCoatingSurface->SetType(dielectric_dielectric);
+    fScintCoatingSurface->SetFinish(groundfrontpainted);
+    fScintCoatingSurface->SetModel(unified);     
+    
     fScintCoatingSurface->SetMaterialPropertiesTable(coatingMPT);
+
+
+    // ---------------------------------------------------------
+    // SiPM optical properties
+    // SiPM efficiency set using the official Hamamatsu specs. Taken from [5] in code.md
+
+    const G4int entries = 26;
+
+    G4double energies[entries]     = {1.405*eV, 1.456*eV, 1.515*eV, 1.597*eV, 1.689*eV,
+				      1.763*eV, 1.836*eV, 1.915*eV, 2.007*eV, 2.105*eV,
+				      2.190*eV, 2.285*eV, 2.366*eV, 2.448*eV, 2.563*eV,
+				      2.718*eV, 2.838*eV, 2.977*eV, 3.099*eV, 3.243*eV,
+				      3.387*eV, 3.525*eV, 3.608*eV, 3.695*eV, 3.762*eV,
+				      3.857*eV };
+    G4double reflectivity[entries] = {0.      ,0.      ,0.      ,0.      ,0.      ,
+				      0.      ,0.      ,0.      ,0.      ,0.      ,
+				      0.      ,0.      ,0.      ,0.      ,0.      ,
+				      0.      ,0.      ,0.      ,0.      ,0.      ,
+				      0.      ,0.      ,0.      ,0.      ,0.      ,
+				      0.      };
+    G4double efficiency[entries]   = {0.0556  ,0.0698  ,0.0893  ,0.1250  ,0.1661  ,
+				      0.1983  ,0.2341  ,0.2663  ,0.3058  ,0.3488  ,
+				      0.3868  ,0.4247  ,0.4499  ,0.4734  ,0.4915  ,
+				      0.4991  ,0.4898  ,0.4662  ,0.4355  ,0.4002  ,
+				      0.3471  ,0.2878  ,0.2308  ,0.1620  ,0.0804  ,
+				      0.0390  };
+
+
+    G4double efficiency_red[entries];
+    for (G4int i=0; i<entries; ++i) {
+      efficiency_red[i] = efficiency[i]*.6;
+    }
+
+    G4MaterialPropertiesTable* sipmMPT = new G4MaterialPropertiesTable();
+    sipmMPT->AddProperty("EFFICIENCY", energies, efficiency_red, entries);
+    sipmMPT->AddProperty("REFLECTIVITY", energies, reflectivity, entries);
+
+    fSiPMSurface = new G4OpticalSurface("SIPM_OPSURF", unified, polished, dielectric_metal);
+    fSiPMSurface->SetMaterialPropertiesTable(sipmMPT);
+
 
 
 }
@@ -181,7 +232,7 @@ void QDDetectorConstruction::ConstructScintillatorLayer1(G4LogicalVolume* mother
 
     G4Box* solidSiPM = new G4Box("solidSiPM", 0.5 * sipmX, 0.5 * sipmY, 0.5 * sipmZ);
     flogicSiPM = new G4LogicalVolume(solidSiPM, fsipmMat, "logicSiPM");
-    flogicSiPM->SetVisAttributes(fsipmVisAtt);
+    flogicSiPM -> SetVisAttributes(fsipmVisAtt);
 
     // first layer of scintillating bars: aligned with Z direction. Y is fixed (height) and X varies with the bar
     G4int nBarsPlane1 = 60;
@@ -259,6 +310,8 @@ void QDDetectorConstruction::ConstructScintillatorLayer1(G4LogicalVolume* mother
                 physBar1,       // inside volume
                 physCoating1,   // outside volume
                 fScintCoatingSurface);
+
+            new G4LogicalSkinSurface("SIPM_OPSURF", flogicSiPM, fSiPMSurface);
 
         }
 
@@ -360,6 +413,8 @@ void QDDetectorConstruction::ConstructScintillatorLayer2(G4LogicalVolume* mother
                 physBar2,       // inside volume
                 physCoating2,   // outside volume
                 fScintCoatingSurface);
+
+            new G4LogicalSkinSurface("SIPM_OPSURF", flogicSiPM, fSiPMSurface);
         }
         }
 
@@ -482,22 +537,17 @@ void QDDetectorConstruction::ConstructSDandField(){
     sdManager -> AddNewDetector(fSensitiveQPUDetector);
     flogicQPU -> SetSensitiveDetector(fSensitiveQPUDetector);
 
-    if (fMode == SimulationMode::INTERNAL || fMode == SimulationMode::BOTH) {
+    fSensitiveSiPMDetector = new QDSensitiveSiPMDetector("/SD/SiPM");
+    sdManager -> AddNewDetector(fSensitiveSiPMDetector);
+    flogicSiPM -> SetSensitiveDetector(fSensitiveSiPMDetector);
 
-        fSensitiveSiPMDetector = new QDSensitiveSiPMDetector("/SD/SiPM");
-        sdManager -> AddNewDetector(fSensitiveSiPMDetector);
-        flogicSiPM -> SetSensitiveDetector(fSensitiveSiPMDetector);
 
-    }
-    if (fMode == SimulationMode::PARAMETERIZED || fMode == SimulationMode::BOTH) {
+    fSensitiveBarDetector = new QDSensitiveBarDetector("/SD/Bar");
+    sdManager -> AddNewDetector(fSensitiveBarDetector);
 
-        fSensitiveBarDetector = new QDSensitiveBarDetector("/SD/Bar");
-        sdManager -> AddNewDetector(fSensitiveBarDetector);
-
-        flogicBar1 -> SetSensitiveDetector(fSensitiveBarDetector);
-        flogicBar2 -> SetSensitiveDetector(fSensitiveBarDetector);
+    flogicBar1 -> SetSensitiveDetector(fSensitiveBarDetector);
+    flogicBar2 -> SetSensitiveDetector(fSensitiveBarDetector);
        
-    }
 
 }
 

@@ -5,7 +5,7 @@
 QDSensitiveBarDetector::QDSensitiveBarDetector(G4String name) : G4VSensitiveDetector(name) {
 
     fTotalEnergyDeposited = 0;
-    collectionName.insert("QmioHitsCollection");
+    collectionName.insert("barCollection");
 
 }
 
@@ -23,7 +23,7 @@ void QDSensitiveBarDetector::Initialize(G4HCofThisEvent *){
 
 void QDSensitiveBarDetector::EndOfEvent(G4HCofThisEvent *){
 
-    G4cout << "Deposited energy in the bars: " << fTotalEnergyDeposited << G4endl;
+    G4cout << "Deposited energy in the bars: " << fTotalEnergyDeposited << " MeV" << G4endl;
 
 }
 
@@ -35,7 +35,6 @@ G4bool QDSensitiveBarDetector::ProcessHits(G4Step *aStep, G4TouchableHistory * )
 
         fTotalEnergyDeposited += fEnergyDeposited;
 
-        //G4cout << "Energy deposited in this step: " << fEnergyDeposited << " GeV" << G4endl;
     }
 
     return true;
