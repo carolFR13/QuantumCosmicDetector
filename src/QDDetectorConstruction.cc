@@ -543,16 +543,14 @@ void QDDetectorConstruction::ConstructSDandField(){
     flogicSiPM -> SetSensitiveDetector(fSensitiveSiPMDetector);
 
 
-        fSensitiveBarDetector = new QDSensitiveBarDetector("/SD/Bar", "barCollection");
-        sdManager -> AddNewDetector(fSensitiveBarDetector);
-    fSensitiveBarDetector = new QDSensitiveBarDetector("/SD/Bar");
+    fSensitiveBarDetector = new QDSensitiveBarDetector("/SD/Bar", "barCollection");
     sdManager -> AddNewDetector(fSensitiveBarDetector);
 
-        flogicBar1 -> SetSensitiveDetector(fSensitiveBarDetector);
-        flogicBar2 -> SetSensitiveDetector(fSensitiveBarDetector);
-        G4cout << "Debug: Sensitive detector attached to logicBar" << G4endl;
+
     flogicBar1 -> SetSensitiveDetector(fSensitiveBarDetector);
     flogicBar2 -> SetSensitiveDetector(fSensitiveBarDetector);
+    G4cout << "Debug: Sensitive detector attached to logicBar" << G4endl;
+
        
 
 }
