@@ -5,7 +5,7 @@
 QDSensitiveQPUDetector::QDSensitiveQPUDetector(G4String name) : G4VSensitiveDetector(name) {
 
     fTotalEnergyDeposited = 0;
-    collectionName.insert("QmioHitsCollection");
+    collectionName.insert("qpuCollection");
 
 }
 
@@ -34,8 +34,6 @@ G4bool QDSensitiveQPUDetector::ProcessHits(G4Step *aStep, G4TouchableHistory * )
     if(fEnergyDeposited > 0){
 
         fTotalEnergyDeposited += fEnergyDeposited;
-
-        //G4cout << "Energy deposited in this step: " << fEnergyDeposited << " GeV" << G4endl;
     }
 
     return true;

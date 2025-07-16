@@ -5,7 +5,7 @@
 QDSensitiveSiPMDetector::QDSensitiveSiPMDetector(G4String name) : G4VSensitiveDetector(name) {
 
     fTotalEnergyDeposited = 0;
-    collectionName.insert("QmioHitsCollection");
+    collectionName.insert("sipmCollection");
 
 }
 
@@ -38,7 +38,7 @@ void QDSensitiveSiPMDetector::EndOfEvent(G4HCofThisEvent *){
     G4cout << "--------------------" << G4endl;
 
     // Si quieres también dejar esto:
-    G4cout << "Deposited energy: " << fTotalEnergyDeposited << " MeV" << G4endl;
+    G4cout << "Deposited energy in the SiPM: " << fTotalEnergyDeposited << " MeV" << G4endl;
 
 }
 
