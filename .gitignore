@@ -1,6 +1,12 @@
 # Compilation folder
 build/
 
+# CRY compiled files
+external/cry_v1.7/lib/
+*.o
+**/testMain
+
+
 *~
 
 # Linux possible temporary files
