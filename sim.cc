@@ -14,8 +14,6 @@
 
 int main(int argc, char** argv){
 
-    G4UIExecutive *ui = new G4UIExecutive(argc,argv);
-
     #ifdef G4MULTITHREADED 
         G4MTRunManager *runManager = new G4MTRunManager;
     #else
@@ -34,13 +32,30 @@ int main(int argc, char** argv){
     // Initialize G4 kernel
     runManager -> Initialize();
 
+    // user interface
+    G4UIExecutive *ui = 0;
+
+    // if no arguments are provided, start the UI session
+    if (argc == 1) {
+        ui = new G4UIExecutive(argc, argv);
+    }
+
     G4VisManager* visManager = new G4VisExecutive();
     visManager->Initialize();
 
     G4UImanager *UImanager = G4UImanager::GetUIpointer();
-    UImanager->ApplyCommand("/control/execute vis.mac");
 
-    ui -> SessionStart();
+    if(ui){
+        // If we are in interactive mode, we can use the UI
+        UImanager->ApplyCommand("/control/execute vis.mac");
+        ui -> SessionStart();
+    } else {
+        // If we are in batch mode, we can execute a macro file
+        G4String command = "/control/execute ";
+        G4String fileName = argv[1];
+        UImanager->ApplyCommand(command + fileName);
+    }
+
 
     delete ui;
     delete visManager;

@@ -44,6 +44,7 @@ file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)
 # This allows running the executable directly from the build directory.
 
 set(MACRO_FILES
+  run.mac
   vis.mac
   default.cry.setup
 )
