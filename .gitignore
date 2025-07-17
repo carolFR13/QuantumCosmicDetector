@@ -2,7 +2,7 @@
 build/
 
 # CRY compiled files
-external/cry_v1.7/lib/
+external/cry_v1.7/lib/libCRY.a
 external/cry_v1.7/src/*.o
 external/cry_v1.7/test/testMain
 
