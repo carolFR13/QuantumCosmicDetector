@@ -54,51 +54,53 @@ void QDEventAction::EndOfEventAction(const G4Event *event) {
     if (barHC->entries() == 0)
         return;
 
-    // Get hit with total values
-    auto barHit = (*barHC)[barHC->entries() - 1];
+    for(G4int i = 0; i < barHC->entries(); ++i) {
 
-    // Print per event (modulo n)
-    auto eventID = event->GetEventID();
-    auto printModulo = G4RunManager::GetRunManager()->GetPrintProgress();
-    if ((printModulo > 0) && (eventID % printModulo == 0)) {
-        G4cout << "---> Energy deposition " << barHit->GetEdep() << G4endl;
-        G4cout << "--> End of event: " << eventID << "\n"
-               << G4endl;
+        // Get the hit from the collection
+        auto barHit = (*barHC)[i];
+
+        // Print per event (modulo n)
+        auto eventID = event->GetEventID();
+        auto printModulo = G4RunManager::GetRunManager()->GetPrintProgress();
+        if ((printModulo > 0) && (eventID % printModulo == 0)) {
+            G4cout << "---> Energy deposition " << barHit->GetEdep() << G4endl;
+            G4cout << "--> End of event: " << eventID << "\n"
+                << G4endl;
+        }
+
+        // Fill ntuples
+        G4int ntBar = fRunAction->GetNtBarHitsId();
+
+        auto analysisManager = G4AnalysisManager::Instance();
+
+        analysisManager->FillNtupleIColumn(ntBar, 0, eventID);
+        analysisManager->FillNtupleIColumn(ntBar, 1, barHit->GetBarID());         // barID
+        analysisManager->FillNtupleSColumn(ntBar, 2, barHit->GetParticleName());  // particle name
+
+        analysisManager->FillNtupleDColumn(ntBar, 3, barHit->GetPos().x() / mm);  // x
+        analysisManager->FillNtupleDColumn(ntBar, 4, barHit->GetPos().y() / mm);  // y
+        analysisManager->FillNtupleDColumn(ntBar, 5, barHit->GetPos().z() / mm);  // z
+
+        // local position
+        analysisManager->FillNtupleDColumn(ntBar, 6, barHit->GetLocalPos().x() / mm);  // x
+        analysisManager->FillNtupleDColumn(ntBar, 7, barHit->GetLocalPos().y() / mm);  // y
+        analysisManager->FillNtupleDColumn(ntBar, 8, barHit->GetLocalPos().z() / mm);  // z
+
+        // times
+        analysisManager->FillNtupleDColumn(ntBar, 9, barHit->GetGlobalTime() / ns);  // tG
+        analysisManager->FillNtupleDColumn(ntBar, 10, barHit->GetTime1() / ns);      // barID
+        analysisManager->FillNtupleDColumn(ntBar, 11, barHit->GetTime2() / ns);
+
+        analysisManager->FillNtupleDColumn(ntBar, 12, barHit->GetEdep() / MeV);
+
+        analysisManager->AddNtupleRow(ntBar);
+
+        G4cout << " Bar " << barHit->GetBarID()
+            << " Edep " << barHit->GetEdep() / MeV << " MeV"
+            << " T1 " << barHit->GetTime1() / ns << " ns"
+            << " T2 " << barHit->GetTime2() / ns << " ns"
+            << G4endl;
     }
-
-    // Fill ntuples
-    G4int ntBar = fRunAction->GetNtBarHitsId();
-
-    auto analysisManager = G4AnalysisManager::Instance();
-
-    analysisManager->FillNtupleIColumn(ntBar, 0, eventID);
-    analysisManager->FillNtupleIColumn(ntBar, 1, barHit->GetBarID());         // barID
-    analysisManager->FillNtupleSColumn(ntBar, 2, barHit->GetParticleName());  // particle name
-
-    analysisManager->FillNtupleDColumn(ntBar, 3, barHit->GetPos().x() / mm);  // x
-    analysisManager->FillNtupleDColumn(ntBar, 4, barHit->GetPos().y() / mm);  // y
-    analysisManager->FillNtupleDColumn(ntBar, 5, barHit->GetPos().z() / mm);  // z
-
-    // local position
-    analysisManager->FillNtupleDColumn(ntBar, 6, barHit->GetLocalPos().x() / mm);  // x
-    analysisManager->FillNtupleDColumn(ntBar, 7, barHit->GetLocalPos().y() / mm);  // y
-    analysisManager->FillNtupleDColumn(ntBar, 8, barHit->GetLocalPos().z() / mm);  // z
-
-    // times
-    analysisManager->FillNtupleDColumn(ntBar, 9, barHit->GetGlobalTime() / ns);  // tG
-    analysisManager->FillNtupleDColumn(ntBar, 10, barHit->GetTime1() / ns);      // barID
-    analysisManager->FillNtupleDColumn(ntBar, 11, barHit->GetTime2() / ns);
-
-    analysisManager->FillNtupleDColumn(ntBar, 12, barHit->GetEdep() / MeV);
-
-    analysisManager->AddNtupleRow(ntBar);
-
-    G4cout << " Bar " << barHit->GetBarID()
-           << " Edep " << barHit->GetEdep() / MeV << " MeV"
-           << " T1 " << barHit->GetTime1() / ns << " ns"
-           << " T2 " << barHit->GetTime2() / ns << " ns"
-           << G4endl;
-
     // if (fCRYOutput && event->GetNumberOfPrimaryVertex() > 0) {
     //     auto vertex = event->GetPrimaryVertex(0);
     //     if (vertex && vertex->GetNumberOfParticle() > 0) {

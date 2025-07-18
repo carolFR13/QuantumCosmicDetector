@@ -104,8 +104,8 @@ G4bool QDSensitiveBarDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *) 
     hit->SetPos(pos);
     hit->SetLocalPos(local);
     hit->SetGlobalTime(globalTime);
-    hit->SetTime1(t1);
-    hit->SetTime2(t2);
+    hit->SetTime1(t1-globalTime);
+    hit->SetTime2(t2-globalTime);
     hit->SetVolumeName(volName);
 
     fHitsCollection->insert(hit);
