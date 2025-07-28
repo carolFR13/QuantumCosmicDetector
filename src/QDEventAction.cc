@@ -101,39 +101,54 @@ void QDEventAction::EndOfEventAction(const G4Event *event) {
             << " T2 " << barHit->GetTime2() / ns << " ns"
             << G4endl;
     }
-    // if (fCRYOutput && event->GetNumberOfPrimaryVertex() > 0) {
-    //     auto vertex = event->GetPrimaryVertex(0);
-    //     if (vertex && vertex->GetNumberOfParticle() > 0) {
-    //         auto primary = vertex->GetPrimary(0);
-    //         if (primary) {
 
-    //         G4ThreeVector pos = vertex -> GetPosition();
-    //         G4ThreeVector dir = primary->GetMomentumDirection();
-    //         G4double energy = primary->GetKineticEnergy();
-    //         G4String pName = primary->GetParticleDefinition()->GetParticleName();
-    //         G4double time = vertex ->GetT0(); // time in seconds
+    G4cout << "CRY output enabled: " << fCRYOutput << G4endl;
 
-    //         // debug prints
-    //         G4cout << "Saving primary particle data:" << G4endl;
-    //         G4cout << "Position: " << pos << G4endl;
-    //         G4cout << "Direction: " << dir << G4endl;
-    //         G4cout << "Energy: " << energy << G4endl;
+    if (fCRYOutput && event->GetNumberOfPrimaryVertex() > 0) {
+        auto vertex = event->GetPrimaryVertex(0);
+        G4int ntCry = fRunAction->GetNtCryId();
 
-    //         analysisManager->FillNtupleDColumn(0, time);
-    //         analysisManager->FillNtupleIColumn(1, event->GetEventID());
-    //         analysisManager->FillNtupleSColumn(2, pName);
-    //         analysisManager->FillNtupleDColumn(3, energy/CLHEP::MeV);
-    //         analysisManager->FillNtupleDColumn(4, dir.x());
-    //         analysisManager->FillNtupleDColumn(5, dir.y());
-    //         analysisManager->FillNtupleDColumn(6, dir.z());
-    //         analysisManager->FillNtupleDColumn(7, pos.x()/CLHEP::mm);
-    //         analysisManager->FillNtupleDColumn(8, pos.y()/CLHEP::mm);
-    //         analysisManager->FillNtupleDColumn(9, pos.z()/CLHEP::mm);
-    //         analysisManager->AddNtupleRow(0);
+        // Add safety check
+        if (ntCry < 0) {
+            G4cout << "Warning: Cosmic ray ntuple not created, skipping fill" << G4endl;
+            return;
+        }
 
-    //         }
-    //     }
-    // }
+
+        if (vertex && vertex->GetNumberOfParticle() > 0) {
+            auto primary = vertex->GetPrimary(0);
+            if (primary) {
+
+            G4ThreeVector pos = vertex -> GetPosition();
+            G4ThreeVector dir = primary->GetMomentumDirection();
+            G4double energy = primary->GetKineticEnergy();
+            G4String pName = primary->GetParticleDefinition()->GetParticleName();
+            G4double time = vertex ->GetT0(); // time in seconds
+
+            // debug prints
+            G4cout << "Saving primary particle data:" << G4endl;
+            G4cout << "Position: " << pos << G4endl;
+            G4cout << "Direction: " << dir << G4endl;
+            G4cout << "Energy: " << energy << G4endl;
+
+            auto analysisManager = G4AnalysisManager::Instance();
+            
+
+            analysisManager->FillNtupleDColumn(ntCry, 0, time);
+            analysisManager->FillNtupleIColumn(ntCry, 1, event->GetEventID());
+            analysisManager->FillNtupleSColumn(ntCry, 2, pName);
+            analysisManager->FillNtupleDColumn(ntCry, 3, energy/CLHEP::MeV);
+            analysisManager->FillNtupleDColumn(ntCry, 4, dir.x());
+            analysisManager->FillNtupleDColumn(ntCry, 5, dir.y());
+            analysisManager->FillNtupleDColumn(ntCry, 6, dir.z());
+            analysisManager->FillNtupleDColumn(ntCry, 7, pos.x()/CLHEP::mm);
+            analysisManager->FillNtupleDColumn(ntCry, 8, pos.y()/CLHEP::mm);
+            analysisManager->FillNtupleDColumn(ntCry, 9, pos.z()/CLHEP::mm);
+            analysisManager->AddNtupleRow(ntCry);
+
+            }
+        }
+    }
 
     G4cout << "End of event action completed" << G4endl;
     return;

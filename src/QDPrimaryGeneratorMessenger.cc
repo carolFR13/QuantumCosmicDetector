@@ -29,7 +29,7 @@ QDPrimaryGeneratorMessenger::QDPrimaryGeneratorMessenger(
   fUpdateCmd -> AvailableForStates(G4State_Idle);
 
   fOutputCmd = new G4UIcmdWithABool("/CRY/output", this);
-  fOutputCmd->SetGuidance("Enable/disable particle data output to CSV file");
+  fOutputCmd->SetGuidance("Enable/disable particle data output to root file");
   fOutputCmd->SetParameterName("Enable", false);
   fOutputCmd->SetDefaultValue(false);
 
@@ -83,6 +83,9 @@ void QDPrimaryGeneratorMessenger::SetNewValue(
         fRunAction->EnableCryOutput(outputVal);
       }
       QDEventAction::SetCRYOutput(outputVal);
+
+      G4cout << "CRY output " << (outputVal ? "enabled" : "disabled") << G4endl;
+
   }
 
   if (command == fVerbosityCmd) {

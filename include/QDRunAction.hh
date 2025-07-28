@@ -23,7 +23,7 @@ public:
 
 private:
   void CreateNtuples();
-  G4bool fCryOutputEnabled{false};
+  G4bool fCryOutputEnabled = true;
   G4int fNtCryId = -1;   // primary cosmic rays
   G4int fNtBarHitsId = -1;   // parameterized times in bars
 

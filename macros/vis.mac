@@ -18,7 +18,7 @@
 /vis/scene/add/axes
 /vis/scene/add/eventID
 
-/CRY/output false
+/CRY/output true
 /CRY/setVerbosity true 
 
 

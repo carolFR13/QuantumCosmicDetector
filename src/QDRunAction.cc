@@ -1,16 +1,20 @@
 #include "QDRunAction.hh"
 #include "G4AnalysisManager.hh"
 
-QDRunAction::QDRunAction() {
+QDRunAction::QDRunAction(): fNtCryId(-1), fNtBarHitsId(-1) {
 
   auto analysisManager = G4AnalysisManager::Instance();
-  analysisManager->SetDefaultFileType("csv"); // usa CSV
+  analysisManager->SetDefaultFileType("root"); 
   analysisManager->SetVerboseLevel(1);
 
 
-  analysisManager->SetFileName("output/main");
+  analysisManager->SetFileName("all_data");
 
   // ------------ file for primary cosmic rays ----------------------
+
+  // Add debug print to verify
+  G4cout << "Debug: fCryOutputEnabled = " << fCryOutputEnabled << G4endl;
+
 
   if (fCryOutputEnabled) {
     fNtCryId = analysisManager->CreateNtuple("primaries", "cosmic rays");
@@ -26,7 +30,7 @@ QDRunAction::QDRunAction() {
     analysisManager->CreateNtupleDColumn(fNtCryId,"z");
     analysisManager->FinishNtuple(fNtCryId);
 
-    analysisManager->SetNtupleFileName(fNtCryId,"output/primaries"); 
+    //analysisManager->SetNtupleFileName(fNtCryId,"output/primaries"); 
   }
 
   // ------------ file for bar sensitive detector ----------------------
@@ -51,7 +55,7 @@ QDRunAction::QDRunAction() {
   analysisManager->CreateNtupleDColumn(fNtBarHitsId,"Edep");    // 12
   analysisManager->FinishNtuple(fNtBarHitsId);
 
-  analysisManager->SetNtupleFileName(fNtBarHitsId,"output/bar_hits"); 
+  //analysisManager->SetNtupleFileName(fNtBarHitsId,"output/bar_hits"); 
 
 
 }
