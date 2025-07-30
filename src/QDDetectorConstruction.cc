@@ -96,6 +96,23 @@ void QDDetectorConstruction::UpdateGeometry() {
     G4RunManager::GetRunManager()->DefineWorldVolume(this->Construct());
 }
 
+void QDDetectorConstruction::SaveGeometry() {
+    std::ofstream file("geometry.csv");
+
+    file << "VolumeName,PositionX(mm),PositionY(mm),PositionZ(mm)\n";
+
+    for (std::size_t i = 0; i < fBarNames.size(); ++i) {
+        G4ThreeVector pos = fBarPositions[i];
+        file << fBarNames[i] << ", "
+             << pos.x()/mm << ", "
+             << pos.y()/mm << ", "
+             << pos.z()/mm << "\n";
+    }
+
+    G4cout << "Detector geometry saved to geometry.csv" << G4endl;
+}
+
+
 void QDDetectorConstruction::DefineScintillatorMaterials() {
 
 
@@ -314,7 +331,10 @@ void QDDetectorConstruction::ConstructScintillatorLayer1(G4LogicalVolume* mother
 
         }
 
-        }
+        fBarNames.push_back(barName);
+        fBarPositions.push_back(G4ThreeVector(posX, locY1, locZ1));
+
+    }
 }
 
 // placed perpendicular with respect to the first layer
@@ -415,6 +435,10 @@ void QDDetectorConstruction::ConstructScintillatorLayer2(G4LogicalVolume* mother
 
             new G4LogicalSkinSurface("SIPM_OPSURF", flogicSiPM, fSiPMSurface);
         }
+
+        fBarNames.push_back(barName);
+        fBarPositions.push_back(G4ThreeVector(locX2, locY2, posZ));
+
         }
 
 }

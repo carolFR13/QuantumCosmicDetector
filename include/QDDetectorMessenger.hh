@@ -2,6 +2,7 @@
 #define QDDETECTORMESSENGER_HH
 
 #include "G4VUserDetectorConstruction.hh"
+#include "G4UIcmdWithoutParameter.hh"
 
 #include "globals.hh"
 #include "G4UImessenger.hh"
@@ -28,6 +29,7 @@ class QDDetectorMessenger : public G4UImessenger {
         G4UIdirectory* fDir;  
         G4UIcmdWithAString* fSetModeCmd;
         QDDetectorConstruction* fDetector;
+        G4UIcmdWithoutParameter* fSaveLayoutCmd;
 
 };
 

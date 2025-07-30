@@ -79,9 +79,14 @@ void QDPrimaryGeneratorMessenger::SetNewValue(
   
   if (command == fOutputCmd) {
       G4bool outputVal = fOutputCmd->GetNewBoolValue(newValue);
+
+      auto runManager = G4RunManager::GetRunManager();
+      fRunAction = (QDRunAction*)runManager->GetUserRunAction();
+
       if (fRunAction) {
         fRunAction->EnableCryOutput(outputVal);
       }
+
       QDEventAction::SetCRYOutput(outputVal);
 
       G4cout << "CRY output " << (outputVal ? "enabled" : "disabled") << G4endl;

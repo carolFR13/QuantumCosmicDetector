@@ -37,6 +37,7 @@
 #include "G4UIcmdWithABool.hh"
 #include "QDRunAction.hh"
 #include "QDEventAction.hh"
+#include "G4RunManager.hh"
 
 class QDPrimaryGeneratorCRY;
 class G4UIdirectory;

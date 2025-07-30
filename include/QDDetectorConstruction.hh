@@ -55,6 +55,7 @@ class QDDetectorConstruction : public G4VUserDetectorConstruction{
         SimulationMode GetSimulationMode() const;
 
         void UpdateGeometry();
+        void SaveGeometry();
 
 
     private:
@@ -100,6 +101,10 @@ class QDDetectorConstruction : public G4VUserDetectorConstruction{
 
         G4double fcoatingThickness = 0.1 * mm; // Coating thickness
         G4bool fcheckOverlaps = false;  // option to activate checking of volumes overlaps
+
+        std::vector<G4ThreeVector> fBarPositions;
+        std::vector<G4String> fBarNames;
+
 
 };
 

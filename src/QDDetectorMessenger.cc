@@ -14,14 +14,20 @@ QDDetectorMessenger::QDDetectorMessenger(QDDetectorConstruction* det)
     fSetModeCmd->SetParameterName("Mode", false);
     fSetModeCmd->SetDefaultValue("internal");
 
+    fSaveLayoutCmd = new G4UIcmdWithoutParameter("/detector/saveLayout", this);
+    fSaveLayoutCmd->SetGuidance("Saves the detector layout to a CSV file.");
+
 }
 
 QDDetectorMessenger::~QDDetectorMessenger() {
     delete fSetModeCmd;
     delete fDir;
+    delete fSaveLayoutCmd;
 }
 
 void QDDetectorMessenger::SetNewValue(G4UIcommand* command, G4String newValue) {
+
+
     if (command == fSetModeCmd) {
         G4cout << "\n=== Detector Messenger receiving mode change ===" << G4endl;
         G4cout << "Current mode before change: " 
@@ -64,5 +70,10 @@ void QDDetectorMessenger::SetNewValue(G4UIcommand* command, G4String newValue) {
         G4cout << "=======================================\n" << G4endl;
     
     }
+    else if (command == fSaveLayoutCmd) {
+        fDetector->SaveGeometry();  // You'll define this method in QDDetectorConstruction
+    }
     
 }
+
+
