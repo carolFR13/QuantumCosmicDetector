@@ -3,6 +3,7 @@
 
 #include "G4VSensitiveDetector.hh"
 #include "G4THitsCollection.hh"
+#include "G4EventManager.hh"
 
 #include "QDBarHit.hh"
 

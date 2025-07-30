@@ -60,9 +60,12 @@ G4bool QDSensitiveBarDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *) 
     G4double globalTime = prePoint->GetGlobalTime();
     G4String volName = prePoint->GetTouchableHandle()->GetVolume()->GetName();
     G4int barID = prePoint->GetTouchableHandle()->GetCopyNumber();
+    G4int eventID = G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID();
+
 
     G4double impactCoord;
     G4double halfLength;
+    G4int planeID = -1;
 
     // transform from global to local coordinates
     G4AffineTransform g2l = prePoint->GetTouchable()->GetHistory()->GetTopTransform();
@@ -72,10 +75,14 @@ G4bool QDSensitiveBarDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *) 
     if (G4StrUtil::contains(volName, "1")) {
         impactCoord = local.z();  // barras alineadas en X
         halfLength = 0.5 * 900.0;
+        planeID = 1; // Assuming plane ID 1 for volume "1"
     } else if (G4StrUtil::contains(volName, "2")) {
         impactCoord = local.x();  // barras alineadas en Y
         halfLength = 0.5 * 1350.0;
+        planeID = 2; // Assuming plane ID 2 for volume "2"
     }
+
+
 
     // CHANGE WHEN YOU HAVE THE REAL INDEX OF REFRACTION !!!
     G4double n = 1.58;
@@ -89,15 +96,20 @@ G4bool QDSensitiveBarDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *) 
 
     // Guardar en un hit o imprimir
     G4cout << "Hit in volume " << volName
-           << " copy number " << barID
-           << " pos = " << pos << " mm"
+           << ", event ID " << eventID
+           << ", bar ID " << barID
+            <<", planeID = " << planeID
+           << ", pos = " << pos << " mm"
            << ", t = " << globalTime << " ns"
            << ", t_arrival1 = " << t1 << " ns"
-           << ", t_arrival2 = " << t2 << " ns" << G4endl;
+           << ", t_arrival2 = " << t2 << " ns" 
+           << ", particle = " << pName
+           << G4endl;
 
     // create and add a new QDBarHit
     // auto hit = (*fHitsCollection)[fHitsCollection->entries() - 1];
     QDBarHit *hit = new QDBarHit();
+    hit->SetEventID(eventID);
     hit->SetBarID(barID);
     hit->SetParticleName(pName);
     hit->SetEdep(edep);
@@ -107,6 +119,8 @@ G4bool QDSensitiveBarDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *) 
     hit->SetTime1(t1-globalTime);
     hit->SetTime2(t2-globalTime);
     hit->SetVolumeName(volName);
+    hit->SetPlaneID(planeID);
+
 
     fHitsCollection->insert(hit);
 

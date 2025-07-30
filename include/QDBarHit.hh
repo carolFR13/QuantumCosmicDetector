@@ -36,6 +36,9 @@ class QDBarHit : public G4VHit {
         void SetTime2(G4double t) { fTimeAtEnd2 = t; }
         void SetGlobalTime(G4double t) { fTimeGlobal = t; }
         void SetVolumeName(G4String name ) { fVolumeName = name; }
+        void SetPlaneID(G4int id) { fPlaneID = id; }
+        void SetEventID(G4int id) { fEventID = id; }
+
 
         // Getters
         G4int GetBarID() const { return fBarID; }
@@ -47,11 +50,15 @@ class QDBarHit : public G4VHit {
         G4double GetTime2() const { return fTimeAtEnd2; }
         G4double GetGlobalTime() const { return fTimeGlobal; }
         G4String GetVolumeName() const { return fVolumeName; }
+        G4int GetPlaneID() const { return fPlaneID; }
+        G4int GetEventID() const { return fEventID; }
 
 
     private:
 
         G4int fBarID = -1;
+        G4int fPlaneID = -1; // ID of the plane the bar belongs to
+        G4int fEventID = -1; // Event ID
 
         G4double fEnergyDep;
         G4double fTimeGlobal;

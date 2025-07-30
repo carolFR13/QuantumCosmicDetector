@@ -1,4 +1,4 @@
-/cry/output true
+/CRY/output true
 
 /run/initialize 
-/run/beamOn 1000000
+/run/beamOn 1000

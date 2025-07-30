@@ -21,5 +21,4 @@ external/cry_v1.7/test/testMain
 .vscode
 
 # analysis files 
-analysis/cry_output_nt_CRY.csv
-analysis/all_data.root
+analysis/data

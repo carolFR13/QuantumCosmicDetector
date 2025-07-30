@@ -53,6 +53,10 @@ QDRunAction::QDRunAction(): fNtCryId(-1), fNtBarHitsId(-1) {
   analysisManager->CreateNtupleDColumn(fNtBarHitsId,"tB");      // 11
   /* energy deposited */
   analysisManager->CreateNtupleDColumn(fNtBarHitsId,"Edep");    // 12
+
+  analysisManager->CreateNtupleIColumn(fNtBarHitsId, "planeID"); // 13
+  analysisManager->CreateNtupleSColumn(fNtBarHitsId, "volumeName"); // 14
+  
   analysisManager->FinishNtuple(fNtBarHitsId);
 
   //analysisManager->SetNtupleFileName(fNtBarHitsId,"output/bar_hits"); 

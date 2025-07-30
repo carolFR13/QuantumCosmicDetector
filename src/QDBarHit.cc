@@ -21,5 +21,6 @@ void QDBarHit::Print() {
            << ", arrival1: " << fTimeAtEnd1 / ns << " ns"
            << ", arrival2: " << fTimeAtEnd2 / ns << " ns"
            << ", energy deposited: " << fEnergyDep / MeV << " MeV"
+           << ", plane ID: " << fPlaneID
            << G4endl;
 }

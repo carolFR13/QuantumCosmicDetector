@@ -61,6 +61,12 @@ void QDEventAction::EndOfEventAction(const G4Event *event) {
 
         // Print per event (modulo n)
         auto eventID = event->GetEventID();
+        if (eventID != barHit->GetEventID()) {
+            G4cout << "Warning: Event ID mismatch in hits collection: "
+                   << "Event ID = " << eventID
+                   << ", Hit Event ID = " << barHit->GetEventID() << G4endl;
+            continue; // Skip this hit if IDs do not match
+        }
         auto printModulo = G4RunManager::GetRunManager()->GetPrintProgress();
         if ((printModulo > 0) && (eventID % printModulo == 0)) {
             G4cout << "---> Energy deposition " << barHit->GetEdep() << G4endl;
@@ -73,7 +79,7 @@ void QDEventAction::EndOfEventAction(const G4Event *event) {
 
         auto analysisManager = G4AnalysisManager::Instance();
 
-        analysisManager->FillNtupleIColumn(ntBar, 0, eventID);
+        analysisManager->FillNtupleIColumn(ntBar, 0, barHit->GetEventID()); // event ID
         analysisManager->FillNtupleIColumn(ntBar, 1, barHit->GetBarID());         // barID
         analysisManager->FillNtupleSColumn(ntBar, 2, barHit->GetParticleName());  // particle name
 
@@ -92,6 +98,8 @@ void QDEventAction::EndOfEventAction(const G4Event *event) {
         analysisManager->FillNtupleDColumn(ntBar, 11, barHit->GetTime2() / ns);
 
         analysisManager->FillNtupleDColumn(ntBar, 12, barHit->GetEdep() / MeV);
+        analysisManager->FillNtupleIColumn(ntBar, 13, barHit->GetPlaneID()); // planeID
+        analysisManager->FillNtupleSColumn(ntBar, 14, barHit->GetVolumeName()); // volumeName
 
         analysisManager->AddNtupleRow(ntBar);
 
