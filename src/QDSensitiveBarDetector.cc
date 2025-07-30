@@ -72,11 +72,11 @@ G4bool QDSensitiveBarDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *) 
 
     G4ThreeVector local = g2l.TransformPoint(pos);
 
-    if (G4StrUtil::contains(volName, "1")) {
+    if (G4StrUtil::contains(volName, "physBar1_")) {
         impactCoord = local.z();  // barras alineadas en X
         halfLength = 0.5 * 900.0;
         planeID = 1; // Assuming plane ID 1 for volume "1"
-    } else if (G4StrUtil::contains(volName, "2")) {
+    } else if (G4StrUtil::contains(volName, "physBar2_")) {
         impactCoord = local.x();  // barras alineadas en Y
         halfLength = 0.5 * 1350.0;
         planeID = 2; // Assuming plane ID 2 for volume "2"

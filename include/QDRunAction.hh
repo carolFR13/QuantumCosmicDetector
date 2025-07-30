@@ -16,6 +16,7 @@ public:
   virtual void EndOfRunAction(const G4Run*) override;
 
   void SetCryOutputEnabled(G4bool enable) { fCryOutputEnabled = enable; }
+    
   G4bool GetCryOutputEnabled() const { return fCryOutputEnabled; }
 
   inline G4int GetNtCryId() const { return fNtCryId; }

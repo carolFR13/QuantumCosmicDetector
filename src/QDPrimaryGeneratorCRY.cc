@@ -74,7 +74,7 @@ void QDPrimaryGeneratorCRY::SetOutputEnabled(G4bool enable) {
    
     if (runAction){
       auto* ra = const_cast<QDRunAction*>(runAction);
-      ra->EnableCryOutput(enable);
+      ra->SetCryOutputEnabled(enable);
     }
 }
 

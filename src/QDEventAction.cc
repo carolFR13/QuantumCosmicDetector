@@ -115,6 +115,7 @@ void QDEventAction::EndOfEventAction(const G4Event *event) {
     if (fCRYOutput && event->GetNumberOfPrimaryVertex() > 0) {
         auto vertex = event->GetPrimaryVertex(0);
         G4int ntCry = fRunAction->GetNtCryId();
+ 
 
         // Add safety check
         if (ntCry < 0) {
@@ -153,7 +154,7 @@ void QDEventAction::EndOfEventAction(const G4Event *event) {
             analysisManager->FillNtupleDColumn(ntCry, 8, pos.y()/CLHEP::mm);
             analysisManager->FillNtupleDColumn(ntCry, 9, pos.z()/CLHEP::mm);
             analysisManager->AddNtupleRow(ntCry);
-
+        
             }
         }
     }

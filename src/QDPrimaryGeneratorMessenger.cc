@@ -84,7 +84,7 @@ void QDPrimaryGeneratorMessenger::SetNewValue(
       fRunAction = (QDRunAction*)runManager->GetUserRunAction();
 
       if (fRunAction) {
-        fRunAction->EnableCryOutput(outputVal);
+        fRunAction->SetCryOutputEnabled(outputVal);
       }
 
       QDEventAction::SetCRYOutput(outputVal);
