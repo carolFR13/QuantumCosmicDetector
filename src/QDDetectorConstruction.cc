@@ -112,7 +112,6 @@ void QDDetectorConstruction::SaveGeometry() {
     G4cout << "Detector geometry saved to geometry.csv" << G4endl;
 }
 
-
 void QDDetectorConstruction::DefineScintillatorMaterials() {
 
 

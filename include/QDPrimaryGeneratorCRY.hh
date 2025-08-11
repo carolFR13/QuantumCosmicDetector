@@ -41,6 +41,9 @@ class QDPrimaryGeneratorCRY : public G4VUserPrimaryGeneratorAction
     void SetVerbosity(G4bool enable);
     G4bool GetVerbosity() const { return fVerbosityEnabled; }
 
+    void SetPlane(const G4String& plane);
+    G4String GetPlane() const { return fPlane; }
+
   private:
     G4ParticleGun* particleGun;
     G4ParticleTable* particleTable;
@@ -61,6 +64,8 @@ class QDPrimaryGeneratorCRY : public G4VUserPrimaryGeneratorAction
     G4bool fOutputEnabled;
 
     G4bool fVerbosityEnabled;
+
+    G4String fPlane = "topWorld"; // default
 };
 
 #endif

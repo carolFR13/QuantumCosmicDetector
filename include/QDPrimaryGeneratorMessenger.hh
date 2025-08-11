@@ -69,6 +69,8 @@ class QDPrimaryGeneratorMessenger: public G4UImessenger
     std::string*                 fMessInput;
     G4UIcmdWithABool*            fOutputCmd;
     G4UIcmdWithABool*            fVerbosityCmd;
+    G4UIcmdWithAString*          fPlaneCmd;
+
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

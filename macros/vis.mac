@@ -19,9 +19,10 @@
 /vis/scene/add/eventID
 
 /CRY/output true
+/CRY/plane qpu
 /CRY/setVerbosity true 
 
 
-/run/beamOn 10
+/run/beamOn 100
 
 

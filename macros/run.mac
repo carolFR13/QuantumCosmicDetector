@@ -1,4 +1,5 @@
 /CRY/output true
+/CRY/plane topWorld
 
 /run/initialize 
 /run/beamOn 1000

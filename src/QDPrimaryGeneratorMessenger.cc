@@ -38,6 +38,13 @@ QDPrimaryGeneratorMessenger::QDPrimaryGeneratorMessenger(
   fVerbosityCmd->SetParameterName("Verbosity", false);
   fVerbosityCmd->SetDefaultValue(false);
 
+  fPlaneCmd = new G4UIcmdWithAString("/CRY/plane", this);
+  fPlaneCmd->SetGuidance("Set the entry plane for CRY particles.");
+  fPlaneCmd->SetParameterName("plane", false);
+  fPlaneCmd->SetCandidates("aboveDetector topWorld qpu");
+  fPlaneCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
+
+
   fMessInput = new std::string;
 
 }
@@ -52,6 +59,8 @@ QDPrimaryGeneratorMessenger::~QDPrimaryGeneratorMessenger()
   delete fFileCmd;
   delete fOutputCmd; 
   delete fVerbosityCmd;
+  delete fPlaneCmd;
+  delete fMessInput;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -96,6 +105,11 @@ void QDPrimaryGeneratorMessenger::SetNewValue(
   if (command == fVerbosityCmd) {
     fCryAction->SetVerbosity(fVerbosityCmd->GetNewBoolValue(newValue));
   }
+
+  if (command == fPlaneCmd) {
+    fCryAction->SetPlane(newValue);
+}
+
 
 }
 

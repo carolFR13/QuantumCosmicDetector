@@ -82,6 +82,11 @@ void QDPrimaryGeneratorCRY::SetVerbosity(G4bool enable) {
     fVerbosityEnabled = enable;
 }
 
+void QDPrimaryGeneratorCRY::SetPlane(const G4String& plane) {
+    fPlane = plane;
+}
+
+
 // Initialize CRY and check world geometry
 void QDPrimaryGeneratorCRY::Initialize()
 {
@@ -191,16 +196,49 @@ void QDPrimaryGeneratorCRY::GeneratePrimaries(G4Event* event)
         //particleGun->SetParticleDefinition(particleDef);
         //particleGun->SetParticleEnergy((*particle)->ke()*MeV); // kinetic energy
 
-        // Transform coordinates so particles come from above:
+        // Transform coordinates so particles come from above (changing to g4 coordinate system):
         // Original (x,y,z) becomes (x,z,y)
-        G4ThreeVector pos((*particle)->x()*meter,           // x stays as x
-                          0.5*world_extent,                // y at top of world
-                          (*particle)->y()*meter);        // y becomes z
 
-        // Transform direction vector the same way
-        G4ThreeVector dir((*particle)->u(),              // x component stays as x
-                          -std::abs((*particle)->w()),   // z component becomes y
-                          (*particle)->v());             // y component becomes z
+        G4ThreeVector pos;
+        G4ThreeVector dir;
+
+        fPlane = GetPlane();
+
+        if (fPlane == "aboveDetector") {
+
+          pos.set((*particle)->x()*meter,         // x stays as x
+                    0.01*meter,             // y at top of world
+                    (*particle)->y()*meter);      // y becomes z
+
+          dir.set((*particle)->u(),                  // x component stays as x
+                   -std::abs((*particle)->w()),      // z component becomes y
+                    (*particle)->v());               // y component becomes z
+        }
+        else if (fPlane == "qpu") {
+
+            pos.set(0, 
+                    0.5*meter,
+                    0);
+
+            dir.set((*particle)->u(), 
+                      -std::abs((*particle)->w()), 
+                      (*particle)->v());
+        }
+        else if (fPlane == "topWorld") {
+
+            pos.set((*particle)->x()*meter, 
+                      0.5*world_extent, 
+                      (*particle)->y()*meter);
+
+            dir.set((*particle)->u(), 
+                    -std::abs((*particle)->w()), 
+                    (*particle)->v());
+        }
+        else {
+          G4String msg = "Unknown plane: " + fPlane;
+          G4Exception("QDPrimaryGeneratorCRY::GeneratePrimaries", "InvalidPlane", FatalException, msg);
+          return;
+        }     
 
         dir = dir.unit();
 
@@ -229,6 +267,9 @@ void QDPrimaryGeneratorCRY::GeneratePrimaries(G4Event* event)
         event->AddPrimaryVertex(vertex);
         // const auto* runAction = dynamic_cast<const QDRunAction*>(G4RunManager::GetRunManager()->GetUserRunAction());
 
+
+        // changing fillntuples to G4EventAction to deal with several files
+        // option in below works well if only CRY output is needed
 
         // if (fOutputEnabled) {
         //   auto analysisManager = G4AnalysisManager::Instance();
@@ -284,11 +325,10 @@ void QDPrimaryGeneratorCRY::GeneratePrimaries(G4Event* event)
   }
 
   // fill
-
-  if (fOutputEnabled) {
-      auto analysisManager = G4AnalysisManager::Instance();
-      analysisManager->AddNtupleRow();
-  }
+  // if (fOutputEnabled) {
+  //     auto analysisManager = G4AnalysisManager::Instance();
+  //     analysisManager->AddNtupleRow();
+  // }
 }
 
 // Set input state to "awaiting input"
