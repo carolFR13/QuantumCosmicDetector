@@ -21,6 +21,7 @@ public:
 
   inline G4int GetNtCryId() const { return fNtCryId; }
   inline G4int GetNtBarHitsId() const { return fNtBarHitsId; }
+  inline G4int GetNtQPUHitsId() const { return fNtQPUHitsId; }
 
   G4bool fNtuplesCreated = false; // Flag to check if ntuples are created
   void CreateNtuples();
@@ -30,6 +31,7 @@ private:
   G4bool fCryOutputEnabled = true;
   G4int fNtCryId = -1;   // primary cosmic rays
   G4int fNtBarHitsId = -1;   // parameterized times in bars
+  G4int fNtQPUHitsId = -1;   // QPU hits
 
 };
 

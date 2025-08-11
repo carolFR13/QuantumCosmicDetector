@@ -8,6 +8,9 @@
 #include "G4THitsCollection.hh"
 #include "globals.hh"
 
+
+// code taken from B4 geant4 example 
+
 class QDBarHit : public G4VHit {
 
     public:

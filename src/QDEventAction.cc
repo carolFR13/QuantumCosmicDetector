@@ -13,6 +13,7 @@
 #include "G4SystemOfUnits.hh"
 #include "G4UnitsTable.hh"
 #include "QDBarHit.hh"
+#include "QDQPUHit.hh"
 #include "QDRunAction.hh"
 
 G4bool QDEventAction::fCRYOutput = false;
@@ -21,19 +22,30 @@ void QDEventAction::BeginOfEventAction(const G4Event *event) {
     G4cout << "Beginning of event action" << G4endl;
 }
 
-QDBarHitsCollection *
-QDEventAction::GetHitsCollection(G4int barID, const G4Event *event) const
+QDBarHitsCollection *QDEventAction::GetBarHitsCollection(G4int barID, const G4Event *event) const {
 
-{
     auto hitsCollection = static_cast<QDBarHitsCollection *>(event->GetHCofThisEvent()->GetHC(barID));
 
     if (!hitsCollection) {
         G4ExceptionDescription msg;
-        msg << "Cannot access hits collection with ID " << barID;
+        msg << "Cannot access bar hits collection with ID " << barID;
         G4Exception("QDEventAction::GetHitsCollection", "MyCode0001", FatalException, msg);
     }
     return hitsCollection;
 }
+
+QDQPUHitsCollection* QDEventAction::GetQPUHitsCollection(G4int qpuID, const G4Event* event) const
+{
+    auto hitsCollection = static_cast<QDQPUHitsCollection*>(event->GetHCofThisEvent()->GetHC(qpuID));
+
+    if (!hitsCollection) {
+        G4ExceptionDescription msg;
+        msg << "Cannot access QPU hits collection with ID " << qpuID;
+        G4Exception("QDEventAction::GetQPUHitsCollection", "MyCode0002",FatalException, msg);
+    }
+    return hitsCollection;
+}
+
 
 void QDEventAction::EndOfEventAction(const G4Event *event) {
     // assign the fRunAction pointer before using it
@@ -46,14 +58,25 @@ void QDEventAction::EndOfEventAction(const G4Event *event) {
     if (fBarHCID == -1) {
         fBarHCID = G4SDManager::GetSDMpointer()->GetCollectionID("barCollection");
     }
+    if (fQPUHCID == -1) {
+        fQPUHCID = G4SDManager::GetSDMpointer()->GetCollectionID("qpuCollection");
+    }
 
     // Get hits collections
-    auto barHC = GetHitsCollection(fBarHCID, event);
+    auto barHC = GetBarHitsCollection(fBarHCID, event);
+    auto qpuHC = GetQPUHitsCollection(fQPUHCID, event);
 
     // protection against no-hit events
     if (barHC->entries() == 0)
         return;
 
+    if (qpuHC->entries() == 0) 
+        return;
+
+    
+    auto analysisManager = G4AnalysisManager::Instance();
+    
+    // Fill bar hits ntuple
     for(G4int i = 0; i < barHC->entries(); ++i) {
 
         // Get the hit from the collection
@@ -76,8 +99,6 @@ void QDEventAction::EndOfEventAction(const G4Event *event) {
 
         // Fill ntuples
         G4int ntBar = fRunAction->GetNtBarHitsId();
-
-        auto analysisManager = G4AnalysisManager::Instance();
 
         analysisManager->FillNtupleIColumn(ntBar, 0, barHit->GetEventID()); // event ID
         analysisManager->FillNtupleIColumn(ntBar, 1, barHit->GetBarID());         // barID
@@ -109,6 +130,35 @@ void QDEventAction::EndOfEventAction(const G4Event *event) {
             << " T2 " << barHit->GetTime2() / ns << " ns"
             << G4endl;
     }
+
+
+
+    // Fill QPU hits ntuple
+    G4int ntQPU = fRunAction->GetNtQPUHitsId();
+
+    for (G4int i = 0; i < qpuHC->entries(); ++i) {
+
+        auto qpuHit = (*qpuHC)[i];
+
+        analysisManager->FillNtupleSColumn(ntQPU, 0, qpuHit->GetParticleName());
+        analysisManager->FillNtupleIColumn(ntQPU, 1, event->GetEventID());
+        analysisManager->FillNtupleDColumn(ntQPU, 2, qpuHit->GetPos().x() / mm);
+        analysisManager->FillNtupleDColumn(ntQPU, 3, qpuHit->GetPos().y() / mm);
+        analysisManager->FillNtupleDColumn(ntQPU, 4, qpuHit->GetPos().z() / mm);
+        analysisManager->FillNtupleDColumn(ntQPU, 5, qpuHit->GetEdep() / MeV);
+
+        analysisManager->AddNtupleRow(ntQPU);
+
+        G4cout << "QPU Hit: Particle " << qpuHit->GetParticleName()
+               << ", Event ID " << event->GetEventID()
+               << ", Position (" << qpuHit->GetPos().x() / mm << ", "
+               << qpuHit->GetPos().y() / mm << ", "
+               << qpuHit->GetPos().z() / mm << ") mm"
+               << ", Energy Dep " << qpuHit->GetEdep() / MeV << " MeV"
+               << G4endl;
+    }
+
+
 
     G4cout << "CRY output enabled: " << fCRYOutput << G4endl;
 

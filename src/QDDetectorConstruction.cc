@@ -557,7 +557,7 @@ void QDDetectorConstruction::ConstructSDandField(){
     // Create and register the SD
     auto sdManager = G4SDManager::GetSDMpointer();
 
-    fSensitiveQPUDetector = new QDSensitiveQPUDetector("/SD/QPU");
+    fSensitiveQPUDetector = new QDSensitiveQPUDetector("/SD/QPU", "qpuCollection");
     sdManager -> AddNewDetector(fSensitiveQPUDetector);
     flogicQPU -> SetSensitiveDetector(fSensitiveQPUDetector);
 

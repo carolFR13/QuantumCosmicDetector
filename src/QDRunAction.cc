@@ -1,7 +1,7 @@
 #include "QDRunAction.hh"
 #include "G4AnalysisManager.hh"
 
-QDRunAction::QDRunAction(): fNtCryId(-1), fNtBarHitsId(-1), fCryOutputEnabled(false) {
+QDRunAction::QDRunAction(): fNtCryId(-1), fNtBarHitsId(-1), fNtQPUHitsId(-1), fCryOutputEnabled(false) {
 
   auto analysisManager = G4AnalysisManager::Instance();
   analysisManager->SetDefaultFileType("root"); 
@@ -40,7 +40,7 @@ void QDRunAction::CreateNtuples() {
   }
     
   // Always create bar hits ntuple
-  fNtBarHitsId = analysisManager->CreateNtuple("hits","bars");
+  fNtBarHitsId = analysisManager->CreateNtuple("barHits","bars");
   analysisManager->CreateNtupleIColumn(fNtBarHitsId,"event");   // 0
   analysisManager->CreateNtupleIColumn(fNtBarHitsId,"barID");   // 1
   analysisManager->CreateNtupleSColumn(fNtBarHitsId,"pName");   // 2
@@ -62,6 +62,23 @@ void QDRunAction::CreateNtuples() {
   analysisManager->CreateNtupleIColumn(fNtBarHitsId, "planeID"); // 13
   analysisManager->CreateNtupleSColumn(fNtBarHitsId, "volumeName"); // 14
   analysisManager->FinishNtuple(fNtBarHitsId);
+
+
+
+  // Always create bar hits ntuple
+  fNtQPUHitsId = analysisManager->CreateNtuple("qpuHits","QPU");
+  analysisManager->CreateNtupleSColumn(fNtQPUHitsId,"pName");    // 0
+  analysisManager->CreateNtupleIColumn(fNtQPUHitsId,"eventID");  // 1
+
+  /*  position */
+  analysisManager->CreateNtupleDColumn(fNtQPUHitsId,"x");       // 2
+  analysisManager->CreateNtupleDColumn(fNtQPUHitsId,"y");       // 3
+  analysisManager->CreateNtupleDColumn(fNtQPUHitsId,"z");       // 4
+
+  /* energy deposited */
+  analysisManager->CreateNtupleDColumn(fNtQPUHitsId,"Edep");    // 5
+
+  analysisManager->FinishNtuple(fNtQPUHitsId);
     
   fNtuplesCreated = true;
 }
