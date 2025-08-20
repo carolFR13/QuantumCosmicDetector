@@ -41,26 +41,37 @@ void QDRunAction::CreateNtuples() {
     
   // Always create bar hits ntuple
   fNtBarHitsId = analysisManager->CreateNtuple("barHits","bars");
-  analysisManager->CreateNtupleIColumn(fNtBarHitsId,"event");   // 0
-  analysisManager->CreateNtupleIColumn(fNtBarHitsId,"barID");   // 1
-  analysisManager->CreateNtupleSColumn(fNtBarHitsId,"pName");   // 2
-  /* global position */
-  analysisManager->CreateNtupleDColumn(fNtBarHitsId,"x");       // 3
-  analysisManager->CreateNtupleDColumn(fNtBarHitsId,"y");       // 4
-  analysisManager->CreateNtupleDColumn(fNtBarHitsId,"z");       // 5
-  /* local position */
-  analysisManager->CreateNtupleDColumn(fNtBarHitsId,"lx");      // 6
-  analysisManager->CreateNtupleDColumn(fNtBarHitsId,"ly");      // 7
-  analysisManager->CreateNtupleDColumn(fNtBarHitsId,"lz");      // 8
+  analysisManager->CreateNtupleIColumn(fNtBarHitsId,"event");            // 0
+  analysisManager->CreateNtupleIColumn(fNtBarHitsId,"barID");            // 1
+  analysisManager->CreateNtupleSColumn(fNtBarHitsId,"pName");            // 2
+  /* earliest global position */
+  analysisManager->CreateNtupleDColumn(fNtBarHitsId,"x1");                // 3
+  analysisManager->CreateNtupleDColumn(fNtBarHitsId,"y1");                // 4
+  analysisManager->CreateNtupleDColumn(fNtBarHitsId,"z1");                // 5
+  /* earliest local position */
+  analysisManager->CreateNtupleDColumn(fNtBarHitsId,"lx1");               // 6
+  analysisManager->CreateNtupleDColumn(fNtBarHitsId,"ly1");               // 7
+  analysisManager->CreateNtupleDColumn(fNtBarHitsId,"lz1");               // 8
+  /* latest global position */
+  analysisManager->CreateNtupleDColumn(fNtBarHitsId,"x2");                // 3
+  analysisManager->CreateNtupleDColumn(fNtBarHitsId,"y2");                // 4
+  analysisManager->CreateNtupleDColumn(fNtBarHitsId,"z2");                // 5
+  /* latest local position */
+  analysisManager->CreateNtupleDColumn(fNtBarHitsId,"lx2");               // 6
+  analysisManager->CreateNtupleDColumn(fNtBarHitsId,"ly2");               // 7
+  analysisManager->CreateNtupleDColumn(fNtBarHitsId,"lz2");               // 8
   /* times */
-  analysisManager->CreateNtupleDColumn(fNtBarHitsId,"tG");      // 9
-  analysisManager->CreateNtupleDColumn(fNtBarHitsId,"tA");      // 10
-  analysisManager->CreateNtupleDColumn(fNtBarHitsId,"tB");      // 11
+  analysisManager->CreateNtupleDColumn(fNtBarHitsId,"tG_earliest");      // 9
+  analysisManager->CreateNtupleDColumn(fNtBarHitsId,"tG_latest");        // 10
+  analysisManager->CreateNtupleDColumn(fNtBarHitsId,"tA_earliest");      // 11
+  analysisManager->CreateNtupleDColumn(fNtBarHitsId,"tB_earliest");      // 12
+  analysisManager->CreateNtupleDColumn(fNtBarHitsId,"tA_latest");        // 13
+  analysisManager->CreateNtupleDColumn(fNtBarHitsId,"tB_latest");        // 14
   /* energy deposited */
-  analysisManager->CreateNtupleDColumn(fNtBarHitsId,"Edep");    // 12
+  analysisManager->CreateNtupleDColumn(fNtBarHitsId,"Edep");             // 15
 
-  analysisManager->CreateNtupleIColumn(fNtBarHitsId, "planeID"); // 13
-  analysisManager->CreateNtupleSColumn(fNtBarHitsId, "volumeName"); // 14
+  analysisManager->CreateNtupleIColumn(fNtBarHitsId, "planeID");         // 16
+  analysisManager->CreateNtupleSColumn(fNtBarHitsId, "volumeName");      // 17
   analysisManager->FinishNtuple(fNtBarHitsId);
 
 

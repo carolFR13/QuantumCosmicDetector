@@ -15,12 +15,14 @@ G4bool QDBarHit::operator==(const QDBarHit& right) const
 
 void QDBarHit::Print() {
     G4cout << "Hit in volume: " << fVolumeName
-           << " at position: " << fglobalPosition 
-           << ", local position: " << flocalPosition 
-           << ", global time: " << fTimeGlobal / ns << " ns"
-           << ", arrival1: " << fTimeAtEnd1 / ns << " ns"
-           << ", arrival2: " << fTimeAtEnd2 / ns << " ns"
-           << ", energy deposited: " << fEnergyDep / MeV << " MeV"
+           << ", event ID: " << fEventID
+           << ", bar ID: " << fBarID
            << ", plane ID: " << fPlaneID
+           << ", earliest arrival at A: " << fEarliestTimeAtEnd_A / ns << " ns"
+           << ", earliest arrival at B: " << fEarliestTimeAtEnd_B / ns << " ns"
+           << ", latest arrival at A: " << fLatestTimeAtEnd_A / ns << " ns"
+           << ", latest arrival at B: " << fLatestTimeAtEnd_B / ns << " ns"
+           << ", energy deposited: " << fEnergyDep / MeV << " MeV"
+           << ", particle: " << fParticleName
            << G4endl;
 }

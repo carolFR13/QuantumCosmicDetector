@@ -104,31 +104,42 @@ void QDEventAction::EndOfEventAction(const G4Event *event) {
         analysisManager->FillNtupleIColumn(ntBar, 1, barHit->GetBarID());         // barID
         analysisManager->FillNtupleSColumn(ntBar, 2, barHit->GetParticleName());  // particle name
 
-        analysisManager->FillNtupleDColumn(ntBar, 3, barHit->GetPos().x() / mm);  // x
-        analysisManager->FillNtupleDColumn(ntBar, 4, barHit->GetPos().y() / mm);  // y
-        analysisManager->FillNtupleDColumn(ntBar, 5, barHit->GetPos().z() / mm);  // z
+        // earliest position
+        analysisManager->FillNtupleDColumn(ntBar, 3, barHit->GetEarliestPos().x() / mm);  // x
+        analysisManager->FillNtupleDColumn(ntBar, 4, barHit->GetEarliestPos().y() / mm);  // y
+        analysisManager->FillNtupleDColumn(ntBar, 5, barHit->GetEarliestPos().z() / mm);  // z
 
         // local position
-        analysisManager->FillNtupleDColumn(ntBar, 6, barHit->GetLocalPos().x() / mm);  // x
-        analysisManager->FillNtupleDColumn(ntBar, 7, barHit->GetLocalPos().y() / mm);  // y
-        analysisManager->FillNtupleDColumn(ntBar, 8, barHit->GetLocalPos().z() / mm);  // z
+        analysisManager->FillNtupleDColumn(ntBar, 6, barHit->GetEarliestLocalPos().x() / mm);  // x
+        analysisManager->FillNtupleDColumn(ntBar, 7, barHit->GetEarliestLocalPos().y() / mm);  // y
+        analysisManager->FillNtupleDColumn(ntBar, 8, barHit->GetEarliestLocalPos().z() / mm);  // z
+
+        // latest position
+        analysisManager->FillNtupleDColumn(ntBar, 9, barHit->GetLatestPos().x() / mm);  // x
+        analysisManager->FillNtupleDColumn(ntBar, 10, barHit->GetLatestPos().y() / mm);  // y
+        analysisManager->FillNtupleDColumn(ntBar, 11, barHit->GetLatestPos().z() / mm);  // z
+
+
+        // local position
+        analysisManager->FillNtupleDColumn(ntBar, 12, barHit->GetLatestLocalPos().x() / mm);  // x
+        analysisManager->FillNtupleDColumn(ntBar, 13, barHit->GetLatestLocalPos().y() / mm);  // y
+        analysisManager->FillNtupleDColumn(ntBar, 14, barHit->GetLatestLocalPos().z() / mm);  // z
 
         // times
-        analysisManager->FillNtupleDColumn(ntBar, 9, barHit->GetGlobalTime() / ns);  // tG
-        analysisManager->FillNtupleDColumn(ntBar, 10, barHit->GetTime1() / ns);      // barID
-        analysisManager->FillNtupleDColumn(ntBar, 11, barHit->GetTime2() / ns);
+        analysisManager->FillNtupleDColumn(ntBar, 15, barHit->GetEarliestGlobalTime() / ns);  // tG
+        analysisManager->FillNtupleDColumn(ntBar, 16, barHit->GetLatestGlobalTime() / ns);  // tG
 
-        analysisManager->FillNtupleDColumn(ntBar, 12, barHit->GetEdep() / MeV);
-        analysisManager->FillNtupleIColumn(ntBar, 13, barHit->GetPlaneID()); // planeID
-        analysisManager->FillNtupleSColumn(ntBar, 14, barHit->GetVolumeName()); // volumeName
+        analysisManager->FillNtupleDColumn(ntBar, 17, barHit->GetEarliestTimeA() / ns);      // tA
+        analysisManager->FillNtupleDColumn(ntBar, 18, barHit->GetEarliestTimeB() / ns);      // tB
+
+        analysisManager->FillNtupleDColumn(ntBar, 19, barHit->GetLatestTimeA() / ns);      // tA
+        analysisManager->FillNtupleDColumn(ntBar, 20, barHit->GetLatestTimeB() / ns);      // tB
+
+        analysisManager->FillNtupleDColumn(ntBar, 21, barHit->GetEdep() / MeV);
+        analysisManager->FillNtupleIColumn(ntBar, 22, barHit->GetPlaneID()); // planeID
+        analysisManager->FillNtupleSColumn(ntBar, 23, barHit->GetVolumeName()); // volumeName
 
         analysisManager->AddNtupleRow(ntBar);
-
-        G4cout << " Bar " << barHit->GetBarID()
-            << " Edep " << barHit->GetEdep() / MeV << " MeV"
-            << " T1 " << barHit->GetTime1() / ns << " ns"
-            << " T2 " << barHit->GetTime2() / ns << " ns"
-            << G4endl;
     }
 
 

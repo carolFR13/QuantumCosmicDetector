@@ -27,40 +27,74 @@ void QDSensitiveBarDetector::Initialize(G4HCofThisEvent *hce) {
     G4cout << "Debug: Added hits collection with ID " << fBarHCID << G4endl;
 }
 
-void QDSensitiveBarDetector::EndOfEvent(G4HCofThisEvent *) {
-    G4cout << "Deposited energy in the bars: " << fTotalEnergyDeposited << G4endl;
+void QDSensitiveBarDetector::EndOfEvent(G4HCofThisEvent*) {
+
+    G4int eventID = G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID();
+
+    for (const auto& kv : hitMap) {
+        const int planeID = kv.first.first;
+        const int barID   = kv.first.second;
+        const Accum& a    = kv.second;
+
+        // skip bars we never actually touched
+        if (!std::isfinite(a.tG_earliest) || !std::isfinite(a.tG_latest))
+            continue;
+
+        QDBarHit* hit = new QDBarHit();
+        hit->SetEventID(eventID);
+        hit->SetPlaneID(planeID);
+        hit->SetBarID(barID);
+        hit->SetParticleName(a.particle);
+        hit->SetVolumeName(a.volName);
+        hit->SetEdep(a.edep_total);
+
+        hit->SetEarliestPos(a.posEarliest);
+        hit->SetEarliestLocalPos(a.localPosEarliest);
+
+        hit->SetLatestPos(a.posLatest);
+        hit->SetLatestLocalPos(a.localPosLatest);
+
+        // store *both* global times and the corresponding tA/tB
+        // (assumes you add these setters to QDBarHit)
+        hit->SetEarliestGlobalTime(a.tG_earliest);
+        hit->SetLatestGlobalTime(a.tG_latest);
+        hit->SetEarliestTimeA(a.tA_earliest);
+        hit->SetEarliestTimeB(a.tB_earliest);
+        hit->SetLatestTimeA(a.tA_latest);
+        hit->SetLatestTimeB(a.tB_latest);
+
+        fHitsCollection->insert(hit);
+    }
+    hitMap.clear();
+
     if (verboseLevel > 1) {
         auto nofHits = fHitsCollection->entries();
-        G4cout << G4endl << "-------->Hits Collection: in this event they are " << nofHits
-               << " hits in the tracker chambers: " << G4endl;
+        G4cout << G4endl << "-------->Hits Collection: in this event there are " << nofHits
+               << " hits in the scintillating bars: " << G4endl;
         for (std::size_t i = 0; i < nofHits; ++i)
             (*fHitsCollection)[i]->Print();
     }
 }
 
+
 G4bool QDSensitiveBarDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *) {
-    if (!aStep) {
-        G4cout << "Error: Null step pointer" << G4endl;
-        return false;
-    }
+    if (!aStep) return false;
 
-    G4Track *track = aStep->GetTrack();
-
-    G4String pName = track->GetDefinition()->GetParticleName();
-    G4double kineticE = track->GetKineticEnergy();
-    G4StepPoint *prePoint = aStep->GetPreStepPoint();
+    G4Track     *track     = aStep->GetTrack();
+    G4StepPoint *prePoint  = aStep->GetPreStepPoint();
     G4StepPoint *postPoint = aStep->GetPostStepPoint();
+
+    G4String       pName = track->GetDefinition()->GetParticleName();
+    G4double       kineticE = track->GetKineticEnergy();
+    G4ThreeVector  pos = prePoint->GetPosition();
+    G4double       globalTime = prePoint->GetGlobalTime();
+    G4String       volName = prePoint->GetTouchableHandle()->GetVolume()->GetName();
+    G4int          barID = prePoint->GetTouchableHandle()->GetCopyNumber();
+    G4int          eventID = G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID();
 
     // Get energy deposit
     G4double edep = aStep->GetTotalEnergyDeposit();
     fTotalEnergyDeposited += edep;
-    G4cout << "  Energy deposit: " << edep / CLHEP::MeV << " MeV" << G4endl;
-
-    G4ThreeVector pos = prePoint->GetPosition();
-    G4double globalTime = prePoint->GetGlobalTime();
-    G4String volName = prePoint->GetTouchableHandle()->GetVolume()->GetName();
-    G4int barID = prePoint->GetTouchableHandle()->GetCopyNumber();
-    G4int eventID = G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID();
 
 
     G4double impactCoord;
@@ -73,58 +107,56 @@ G4bool QDSensitiveBarDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *) 
     G4ThreeVector local = g2l.TransformPoint(pos);
 
     if (G4StrUtil::contains(volName, "physBar1_")) {
-        impactCoord = local.z();  // barras alineadas en X
+        impactCoord = local.z();  // bars aligned to X
         halfLength = 0.5 * 900.0;
-        planeID = 1; // Assuming plane ID 1 for volume "1"
+        planeID = 1; // plane ID 1 for volume "1"
     } else if (G4StrUtil::contains(volName, "physBar2_")) {
-        impactCoord = local.x();  // barras alineadas en Y
+        impactCoord = local.x();  // bars aligned to Y
         halfLength = 0.5 * 1350.0;
-        planeID = 2; // Assuming plane ID 2 for volume "2"
+        planeID = 2; //plane ID 2 for volume "2"
+    } else {
+        return false; // not one of our bars
     }
-
-
 
     // CHANGE WHEN YOU HAVE THE REAL INDEX OF REFRACTION !!!
     G4double n = 1.58;
     G4double vg = CLHEP::c_light / n;
 
-    G4double d1 = halfLength - impactCoord;
-    G4double d2 = halfLength + impactCoord;
+    G4double dA = halfLength - impactCoord;
+    G4double dB = halfLength + impactCoord;
 
-    G4double t1 = globalTime + d1 / vg;
-    G4double t2 = globalTime + d2 / vg;
+    G4double tA = globalTime + dA / vg;
+    G4double tB = globalTime + dB / vg;
 
-    // Guardar en un hit o imprimir
-    G4cout << "Hit in volume " << volName
-           << ", event ID " << eventID
-           << ", bar ID " << barID
-            <<", planeID = " << planeID
-           << ", pos = " << pos << " mm"
-           << ", t = " << globalTime << " ns"
-           << ", t_arrival1 = " << t1 << " ns"
-           << ", t_arrival2 = " << t2 << " ns" 
-           << ", particle = " << pName
-           << G4endl;
+    // update accumulator for this bar (per event)
+    auto& acc = hitMap[{planeID, barID}];
 
-    // create and add a new QDBarHit
-    // auto hit = (*fHitsCollection)[fHitsCollection->entries() - 1];
-    QDBarHit *hit = new QDBarHit();
-    hit->SetEventID(eventID);
-    hit->SetBarID(barID);
-    hit->SetParticleName(pName);
-    hit->SetEdep(edep);
-    hit->SetPos(pos);
-    hit->SetLocalPos(local);
-    hit->SetGlobalTime(globalTime);
-    hit->SetTime1(t1-globalTime);
-    hit->SetTime2(t2-globalTime);
-    hit->SetVolumeName(volName);
-    hit->SetPlaneID(planeID);
+    // keep some context once 
+    if (acc.particle.empty())
+        acc.particle = pName;
+    if (acc.volName.empty())
+        acc.volName  = volName;
+
+    acc.edep_total += edep;
 
 
-    fHitsCollection->insert(hit);
+    // earliest by global time
+    if (globalTime < acc.tG_earliest) {
+        acc.tG_earliest     = globalTime;
+        acc.tA_earliest     = tA-globalTime;
+        acc.tB_earliest     = tB-globalTime;
+        acc.posEarliest     = pos;
+        acc.localPosEarliest= local;
+    }
 
-    G4cout << "  Hit created in bar " << barID << G4endl;
+    // latest by global time
+    if (globalTime > acc.tG_latest) {
+        acc.tG_latest       = globalTime;
+        acc.tA_latest       = tA-globalTime;
+        acc.tB_latest       = tB-globalTime;
+        acc.posLatest       = pos;
+        acc.localPosLatest  = local;
+    }
 
     return true;
 }
