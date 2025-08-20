@@ -1,5 +1,5 @@
 /CRY/output true
-/CRY/plane topWorld
+/CRY/plane qpu
 
 /run/initialize 
-/run/beamOn 1000
+/run/beamOn 1000000
