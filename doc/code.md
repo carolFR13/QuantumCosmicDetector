@@ -50,9 +50,11 @@ Ultimately, the goal of the simulation is to obtain the times at which the photo
 
 3. Particle detection. 
 
-In order to detect the cosmic rays impacted we declared the sensitive detectors specified in the previous section. We have three sensitive volumes, and thus the easiest approach to follow is to save the relevant variables for each volume in three different files, however, if the output file is in root format this option is not available [6]. 
+In order to detect the cosmic rays impacted we declared the sensitive detectors specified in the previous section. We have three sensitive volumes, and thus the easiest approach to follow is to save the relevant variables for each volume in three different files, however, if the output file is in root format this option is not available [6]. Therefore the procedure would be to generate a root file with different branches, one for each generated file.
 
-Another detail to have into account is that the output files would be conditioned by the mode of the simulation chosen, and the generated ntuples to be saved in the same root file are conditioned to the user choice, and should also change when the command defined in the DetectorMessenger class is called.
+Here the structure to save the sensitive files would be the same as in the B4 basic example [7], we create a Hit structure to define how the hits are saved, then we process the information in the SensitiveDetector class, and we create and fill the files in the EventAction and RunAction classes. We note here that the CRY output is not generated following this structure, since we are saving the data of the generated paricles, without any interaction, thus we don't need nor a sensitivedetector not a hit structure to save it.
+
+Another detail to have into account is that the output files would be conditioned by the mode of the simulation chosen, and the generated ntuples to be saved in the same root file are conditioned to the user choice, and should also change when the command defined in the DetectorMessenger class is called. In principle this can be handled by geant4 with the declared messengers and by defining a integer ID for each of the ntuples, so they are organized by geant4, instead of selecting us the order of the files.
 
 
 [1] https://www.youtube.com/watch?v=Lxb4WZyKeCE&list=PLLybgCU6QCGWgzNYOV0SKen9vqg4KXeVL
@@ -61,3 +63,4 @@ Another detail to have into account is that the output files would be conditione
 [4] https://geant4-userdoc.web.cern.ch/UsersGuides/ForApplicationDeveloper/html/TrackingAndPhysics/physicsProcess.html#optical-photon-processes
 [5] https://github.com/next-exp/nexus/blob/master/source/geometries/SiPM11.cc
 [6] https://geant4-ed-project.pages.in2p3.fr/geant4-ed-web/docs/analysis.pdf
+[7] https://gitlab.cern.ch/geant4/geant4/-/tree/master/examples/basic/B4
